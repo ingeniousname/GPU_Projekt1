@@ -1,0 +1,75 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <CudaCompile Include="clustering_par.cu">
+      <Filter>clustering_par</Filter>
+    </CudaCompile>
+    <CudaCompile Include="update_index_naive.cu">
+      <Filter>clustering_par</Filter>
+    </CudaCompile>
+    <CudaCompile Include="reduce.cu">
+      <Filter>clustering_par</Filter>
+    </CudaCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="main.cpp" />
+    <ClCompile Include="clustering_seq.cpp">
+      <Filter>clustering_seq</Filter>
+    </ClCompile>
+    <ClCompile Include="data_reader.cpp">
+      <Filter>data_definition</Filter>
+    </ClCompile>
+    <ClCompile Include="PointsData.cpp">
+      <Filter>data_definition</Filter>
+    </ClCompile>
+    <ClCompile Include="Timer.cpp">
+      <Filter>utils</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="clustering_seq.h">
+      <Filter>clustering_seq</Filter>
+    </ClInclude>
+    <ClInclude Include="data_reader.h">
+      <Filter>data_definition</Filter>
+    </ClInclude>
+    <ClInclude Include="PointsData.h">
+      <Filter>data_definition</Filter>
+    </ClInclude>
+    <ClInclude Include="Timer.h">
+      <Filter>utils</Filter>
+    </ClInclude>
+    <ClInclude Include="cudaError.h">
+      <Filter>utils</Filter>
+    </ClInclude>
+    <ClInclude Include="clustering_par.h">
+      <Filter>clustering_par</Filter>
+    </ClInclude>
+    <ClInclude Include="update_index_naive.h">
+      <Filter>clustering_par</Filter>
+    </ClInclude>
+    <ClInclude Include="reduce.cuh">
+      <Filter>clustering_par</Filter>
+    </ClInclude>
+    <ClInclude Include="thrust_data.h">
+      <Filter>data_definition</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="clustering_seq">
+      <UniqueIdentifier>{f5d854fc-7a59-44c5-b82d-eb2815e23d57}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="data_definition">
+      <UniqueIdentifier>{0ec85a03-d801-4bc9-9395-1f9bcff28ca5}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="utils">
+      <UniqueIdentifier>{586aa30b-f2ae-4253-ba1f-cdb4bef62d44}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="clustering_par">
+      <UniqueIdentifier>{390604da-7a34-4cd6-a98a-c52a550be8db}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="clustering_par\thrust">
+      <UniqueIdentifier>{91aea184-5c4a-4d81-8d34-fa87abe96203}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+</Project>
