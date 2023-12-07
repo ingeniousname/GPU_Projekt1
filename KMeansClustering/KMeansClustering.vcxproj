@@ -77,29 +77,30 @@
     </CudaCompile>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <CudaCompile Include="clustering_par.cu">
-      <CodeGeneration Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">compute_52,sm_52</CodeGeneration>
-    </CudaCompile>
+    <CudaCompile Include="clustering_par_common.cu" />
+    <CudaCompile Include="clustering_par_reduce.cu" />
+    <CudaCompile Include="clustering_par_thrust.cu" />
     <CudaCompile Include="reduce.cu" />
-    <CudaCompile Include="update_index_naive.cu" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="clustering_seq.cpp" />
     <ClCompile Include="data_reader.cpp" />
     <ClCompile Include="main.cpp" />
-    <ClCompile Include="PointsData.cpp" />
+    <ClCompile Include="output_writer.cpp" />
+    <ClCompile Include="points_data.cpp" />
     <ClCompile Include="Timer.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="clustering_par.h" />
+    <ClInclude Include="clustering_par_common.cuh" />
+    <ClInclude Include="clustering_par_reduce.cuh" />
+    <ClInclude Include="clustering_par_thrust.cuh" />
     <ClInclude Include="clustering_seq.h" />
     <ClInclude Include="cudaError.h" />
     <ClInclude Include="data_reader.h" />
-    <ClInclude Include="PointsData.h" />
+    <ClInclude Include="output_writer.h" />
+    <ClInclude Include="points_data.h" />
     <ClInclude Include="reduce.cuh" />
-    <ClInclude Include="thrust_data.h" />
     <ClInclude Include="Timer.h" />
-    <ClInclude Include="update_index_naive.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

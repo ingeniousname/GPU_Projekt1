@@ -3,61 +3,113 @@
 #include "clustering_seq.h"
 #include <iostream>
 #include "Timer.h"
-#include "clustering_par.h"
-#include "update_index_naive.h"
+#include "clustering_par_thrust.cuh"
+#include "clustering_par_reduce.cuh"
+#include "clustering_par_common.cuh"
+#include "output_writer.h"
 
-int main()
+int main(int argc, char* argv[])
 {
-	PointsData data1, data2;
-	const int NUM_CLUSTERS = 2;
-	PointsData_FlatArray data_flat;
+	if (argc != 5)
 	{
-		Timer t("Data reading");
-		read_data_binary("./data/binary_data1m", data1);
-		read_data_binary("./data/binary_data1m", data2);
-		initForCalculations(data2, NUM_CLUSTERS);
-		//initForCalculations(data1, NUM_CLUSTERS);
-		data_flat = ConvertToSeqAndFree(data2);
+		printf("U¯YCIE: ./KMeansClustering <plik_wejsciowy> <plik_wyjsciowy> <iloœæ_klastrów> <numer trybu>\nTryby dzialania:\n0 - CPU\n1 - GPU (liczenie srodkow na CPU)\n2 - GPU (thrust)\n3 - GPU (zmodyfikowana funkcja redukcji)");
+		return 1;
 	}
-	//for (int i = 0; i < data.n; i++)
-	//{
-	//	for (int j = 0; j < data.d; j++)
-	//		std::cout << data.data[i * data.d + j] << " ";
-	//	std::cout << "\n";
-	//}
-	//KMeansClustering_seq(data, 2);
-	//initForCalculations(data1, 2);
-	//float* dist = new float[data.n * data.k];
-	//calcDistSeq(data, dist);
+
+	PointsData data;
+	const int MAX_ITERS = 500;
+	const int NUM_CLUSTERS = atoi(argv[3]);
+	const int mode = atoi(argv[4]);
+
 	{
-		Timer t("seq");
-		KMeansClustering_seq(data1, NUM_CLUSTERS);
-		
-	
-	}
-	{
-		Timer t("par");
-		Kmeans_par_NewClusterSumGPU(data_flat, NUM_CLUSTERS);
-		//Kmeans_par_NewClusterSumGPUWithThrust(data_flat, NUM_CLUSTERS);
-	}
-	//for (int i = 0; i < data.n * data.d; i++)
-	//	std::cout << dist[i] << "\n";
-	//int checksum = 0;
-	//for (int i = 0; i < data1.n; i++)
-	//	checksum += data1.clusterIndex[i] - data2.clusterIndex[i];
-	//std::cout << checksum << "\n";
-	//delete[] dist;
-	
-	for (int i = 0; i < data_flat.ndk[2]; i++)
-	{
-		std::cout << "C" << i << ": ";
-		for (int j = 0; j < data_flat.ndk[1]; j++)
-		{
-			std::cout << data_flat.clusterData[i * data_flat.ndk[1] + j] << " ";
+		Timer_CPU t("Czytanie danych", true);
+		try {
+			read_data_universal(argv[1], data);
+			initForCalculations(data, NUM_CLUSTERS);
 		}
-		std::cout << "\n";
+		catch (std::exception e)
+		{
+			std::cerr << e.what() << "\n";
+			exit(1);
+		}
+
 	}
+	PointsData_SOA data_SOA;
+
+	switch (mode)
+	{
+	case 0:
+		{
+			{
+				Timer_CPU t("Caly algorytm", true);
+				KMeansClustering_seq(data, MAX_ITERS);
+			}
+		}
+		break;
+	case 1:
+		{
+			{
+				Timer_CPU t("Zamiana danych na format SOA", true);
+				data_SOA = ConvertToSOAAndFree(data);
+			}
+			{
+				Timer_CPU t("Caly algorytm", true);
+				Kmeans_par_UpdateClusterOnCPU(data_SOA, MAX_ITERS);
+			}
+		}
+		break;
+	case 2:
+		{
+			
+			{
+				Timer_CPU t("Zamiana danych na format SOA", true);
+				data_SOA = ConvertToSOAAndFree(data);
+			}
+			{
+				Timer_CPU t("Caly algorytm", true);
+				Kmeans_par_thrust(data_SOA, MAX_ITERS);
+			}
+		}
+		break;
+	case 3:
+		{
+			{
+				Timer_CPU t("Zamiana danych na format SOA", true);
+				data_SOA = ConvertToSOAAndFree(data);
+			}
+			{
+				Timer_CPU t("Caly algorytm", true);
+				Kmeans_par_modifiedReduce(data_SOA, MAX_ITERS);
+			}
+		}
+		break;
+	default:
+		std::cout << "ERROR! Nieznany tryb dzia³ania!\n";
+		exit(1);
+	}
+	
+	{
+		Timer_CPU t("Wypisywanie odpowiedzi", true);
+		try {
+
+			if (mode == 0)
+			{
+				write_output(argv[2], data.clusterData, data.clusterIndex, data.n, data.d, data.k);
+				free_data(data);
+			}
+			else
+			{
+				write_output(argv[2], data_SOA.clusterData, data_SOA.clusterIndex, data_SOA.ndk[0], data_SOA.ndk[1], data_SOA.ndk[2]);
+				free_data_SOA(data_SOA);
+			}
+		}
+		catch (std::exception e)
+		{
+			std::cerr << e.what() << "\n";
+			exit(1);
+		}
+	}
+
 	cudaDeviceReset();
-	//free_data(data);
 	return 0;
 }

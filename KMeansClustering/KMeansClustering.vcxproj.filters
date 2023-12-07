@@ -1,14 +1,17 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
-    <CudaCompile Include="clustering_par.cu">
-      <Filter>clustering_par</Filter>
-    </CudaCompile>
-    <CudaCompile Include="update_index_naive.cu">
-      <Filter>clustering_par</Filter>
-    </CudaCompile>
     <CudaCompile Include="reduce.cu">
       <Filter>clustering_par</Filter>
+    </CudaCompile>
+    <CudaCompile Include="clustering_par_reduce.cu">
+      <Filter>clustering_par\reduce</Filter>
+    </CudaCompile>
+    <CudaCompile Include="clustering_par_common.cu">
+      <Filter>clustering_par</Filter>
+    </CudaCompile>
+    <CudaCompile Include="clustering_par_thrust.cu">
+      <Filter>clustering_par\thrust</Filter>
     </CudaCompile>
   </ItemGroup>
   <ItemGroup>
@@ -19,11 +22,14 @@
     <ClCompile Include="data_reader.cpp">
       <Filter>data_definition</Filter>
     </ClCompile>
-    <ClCompile Include="PointsData.cpp">
+    <ClCompile Include="points_data.cpp">
       <Filter>data_definition</Filter>
     </ClCompile>
     <ClCompile Include="Timer.cpp">
       <Filter>utils</Filter>
+    </ClCompile>
+    <ClCompile Include="output_writer.cpp">
+      <Filter>data_definition</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -33,7 +39,7 @@
     <ClInclude Include="data_reader.h">
       <Filter>data_definition</Filter>
     </ClInclude>
-    <ClInclude Include="PointsData.h">
+    <ClInclude Include="points_data.h">
       <Filter>data_definition</Filter>
     </ClInclude>
     <ClInclude Include="Timer.h">
@@ -42,16 +48,19 @@
     <ClInclude Include="cudaError.h">
       <Filter>utils</Filter>
     </ClInclude>
-    <ClInclude Include="clustering_par.h">
-      <Filter>clustering_par</Filter>
-    </ClInclude>
-    <ClInclude Include="update_index_naive.h">
-      <Filter>clustering_par</Filter>
-    </ClInclude>
     <ClInclude Include="reduce.cuh">
       <Filter>clustering_par</Filter>
     </ClInclude>
-    <ClInclude Include="thrust_data.h">
+    <ClInclude Include="clustering_par_reduce.cuh">
+      <Filter>clustering_par\reduce</Filter>
+    </ClInclude>
+    <ClInclude Include="clustering_par_thrust.cuh">
+      <Filter>clustering_par\thrust</Filter>
+    </ClInclude>
+    <ClInclude Include="clustering_par_common.cuh">
+      <Filter>clustering_par</Filter>
+    </ClInclude>
+    <ClInclude Include="output_writer.h">
       <Filter>data_definition</Filter>
     </ClInclude>
   </ItemGroup>
@@ -69,7 +78,10 @@
       <UniqueIdentifier>{390604da-7a34-4cd6-a98a-c52a550be8db}</UniqueIdentifier>
     </Filter>
     <Filter Include="clustering_par\thrust">
-      <UniqueIdentifier>{91aea184-5c4a-4d81-8d34-fa87abe96203}</UniqueIdentifier>
+      <UniqueIdentifier>{a7f939b6-bd4a-40ea-bf2c-da9d88f62ae7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="clustering_par\reduce">
+      <UniqueIdentifier>{d3554c01-b255-468b-a617-3dfb2c1aaf4a}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
 </Project>

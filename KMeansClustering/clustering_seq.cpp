@@ -1,70 +1,76 @@
 #include "clustering_seq.h"
 #include "cstring"
 #include "climits"
+#include "Timer.h"
 #include <iostream>
 
-void KMeansClustering_seq(PointsData& data, int k)
+void KMeansClustering_seq(PointsData& data, int MAX_ITERS)
 {
-	const float threshold = 1e-8;
-	int delta = 0;
-	int* clusterCount = new int[k];
+	int delta = 1;
+	int iter = 0;
+	int* clusterCount = new int[data.k];
 
+	float time_dist_calc = 0;
+	float time_cluster_calc = 0;
 
-	data.clusterIndex = new int[data.n];
-	data.clusterData = new float[data.d * k];
-	memset(data.clusterIndex, 0, data.n * sizeof(int));
-	for (int i = 0; i < data.d * k; i++)
-		data.clusterData[i] = data.data[i];
-
-
-	do
+	while(delta > 0 && iter < MAX_ITERS)
 	{
+		iter++;
 		delta = 0;
-		for (int i = 0; i < data.n; i++)
 		{
-			int lastIdx = data.clusterIndex[i];
-			int nextIdx = -1;
-			float minDist = 1e10;
-			for (int j = 0; j < k; j++)
+			Timer_CPU t("obliczanie odleglosci i obliczanie nowych indeksow klastrow dla punktow");
+			for (int i = 0; i < data.n; i++)
 			{
-				float d = dist(data, i, j);
-				if (d < minDist)
+				int lastIdx = data.clusterIndex[i];
+				int nextIdx = -1;
+				float minDist = 1e30;
+				for (int j = 0; j < data.k; j++)
 				{
-					nextIdx = j;
-					minDist = d;
+					float d = dist(data, i, j);
+					if (d < minDist)
+					{
+						nextIdx = j;
+						minDist = d;
+					}
+				}
+
+				data.clusterIndex[i] = nextIdx;
+				if (lastIdx != nextIdx)
+					delta++;
+			}
+			time_dist_calc += t.getElapsed();
+		}
+
+		memset(data.clusterData, 0, data.d * data.k * sizeof(float));
+		memset(clusterCount, 0, data.k * sizeof(int));
+		{
+			Timer_CPU t("aktualizacja centrow klastrow");
+			for (int i = 0; i < data.n; i++)
+			{
+				clusterCount[data.clusterIndex[i]]++;
+				for (int j = 0; j < data.d; j++)
+				{
+					data.clusterData[data.clusterIndex[i] * data.d + j] += data.data[i * data.d + j];
 				}
 			}
-
-			data.clusterIndex[i] = nextIdx;
-			if (lastIdx != nextIdx)
-				delta++;
-		}
-
-		memset(data.clusterData, 0, data.d * k * sizeof(float));
-		memset(clusterCount, 0, k * sizeof(int));
-		for (int i = 0; i < data.n; i++)
-		{
-			clusterCount[data.clusterIndex[i]]++;
-			for (int j = 0; j < data.d; j++)
+			
+			for (int i = 0; i < data.k; i++)
 			{
-				data.clusterData[data.clusterIndex[i] * data.d + j] += data.data[i * data.d + j];
+				for (int j = 0; j < data.d; j++)
+				{
+					data.clusterData[i * data.d + j] /= clusterCount[i];
+				}
 			}
+			time_cluster_calc += t.getElapsed();
 		}
 
-		for (int i = 0; i < k; i++)
-		{
-			for (int j = 0; j < data.d; j++)
-			{
-				data.clusterData[i * data.d + j] /= clusterCount[i];
-				//std::cout << data.clusterData[i * data.d + j] << ", ";
-			}
-		}
-		//std::cout << "\n";
-
-	} while ((float)delta / data.n >= threshold);
-	data.k = k;
+	}
 	data.afterCalculation = true;
 	delete[] clusterCount;
+	std::cout << "Ilosc iteracji: " << iter << ".\n";
+	std::cout << "delta = " << delta << ".\n";
+	std::cout << "Sredni czas obliczania indeksow nowych centrow dla punktow: " << time_dist_calc / iter << "s.\n";
+	std::cout << "Sredni czas obliczania nowych centrow: " << time_cluster_calc / iter << "s.\n";
 }
 
 
